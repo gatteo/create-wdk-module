@@ -1,0 +1,7 @@
+.github/
+tests/
+coverage/
+.editorconfig
+.gitignore
+tsconfig.json
+*.test.js
