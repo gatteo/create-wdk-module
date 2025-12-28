@@ -4,7 +4,7 @@ import { TemplateContext } from '../types.js'
 
 const PLACEHOLDER_REGEX = /\{\{([A-Z_]+)\}\}/g
 
-export async function copyTemplate(
+export async function copyTemplate (
   templateDir: string,
   targetDir: string,
   context: TemplateContext
@@ -30,7 +30,7 @@ export async function copyTemplate(
   }
 }
 
-async function getAllFiles(dir: string): Promise<string[]> {
+async function getAllFiles (dir: string): Promise<string[]> {
   const entries = await fs.readdir(dir, { withFileTypes: true })
   const files: string[] = []
 
@@ -49,24 +49,26 @@ async function getAllFiles(dir: string): Promise<string[]> {
   return files
 }
 
-function processPath(filePath: string, context: TemplateContext): string {
-  return filePath.replace(PLACEHOLDER_REGEX, (_, key) => {
-    return context[key as keyof TemplateContext] || key
+function processPath (filePath: string, context: TemplateContext): string {
+  return filePath.replace(PLACEHOLDER_REGEX, (_, key: string) => {
+    const value = context[key as keyof TemplateContext]
+    return value !== '' && value != null ? value : key
   })
 }
 
-function processContent(content: string, context: TemplateContext): string {
-  return content.replace(PLACEHOLDER_REGEX, (_, key) => {
-    return context[key as keyof TemplateContext] || `{{${key}}}`
+function processContent (content: string, context: TemplateContext): string {
+  return content.replace(PLACEHOLDER_REGEX, (_, key: string) => {
+    const value = context[key as keyof TemplateContext]
+    return value !== '' && value != null ? value : `{{${key}}}`
   })
 }
 
-function isBinaryFile(filePath: string): boolean {
+function isBinaryFile (filePath: string): boolean {
   const binaryExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.ico', '.woff', '.woff2', '.ttf', '.eot']
   return binaryExtensions.some(ext => filePath.toLowerCase().endsWith(ext))
 }
 
-export async function copyCommonFiles(
+export async function copyCommonFiles (
   commonDir: string,
   targetDir: string,
   context: TemplateContext

@@ -10,14 +10,14 @@ export interface CreateModuleOptions {
 }
 
 export interface TemplateContext {
-  MODULE_NAME: string      // @myorg/wdk-wallet-stellar
-  CLASS_NAME: string       // Stellar
+  MODULE_NAME: string // @myorg/wdk-wallet-stellar
+  CLASS_NAME: string // Stellar
   CLASS_NAME_LOWER: string // stellar (for filenames)
-  PACKAGE_NAME: string     // wdk-wallet-stellar
-  BLOCKCHAIN: string       // stellar
-  DESCRIPTION: string      // Stellar wallet module for WDK
-  YEAR: string            // 2025
-  AUTHOR: string          // From git config or prompt
+  PACKAGE_NAME: string // wdk-wallet-stellar
+  BLOCKCHAIN: string // stellar
+  DESCRIPTION: string // Stellar wallet module for WDK
+  YEAR: string // 2025
+  AUTHOR: string // From git config or prompt
 }
 
 export interface ModuleConfig {
