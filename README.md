@@ -2,7 +2,7 @@
 
 Create WDK (Wallet Development Kit) modules with a single command.
 
-<video src="create-wdk-module-demo.mp4" controls width="600"></video>
+<video src="https://github.com/user-attachments/assets/e342eeef-1e45-4ac0-bd16-bb5cdd63d501" controls width="600"></video>
 
 ## Quick Start
 
