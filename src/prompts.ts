@@ -10,15 +10,15 @@ interface PartialOptions {
   git?: boolean
 }
 
-export async function runPrompts(partial: PartialOptions): Promise<CreateModuleOptions> {
-  const onCancel = () => {
+export async function runPrompts (partial: PartialOptions): Promise<CreateModuleOptions> {
+  const onCancel = (): never => {
     throw new Error('cancelled')
   }
 
   const questions: prompts.PromptObject[] = []
 
   // Module type
-  if (!partial.type) {
+  if (partial.type == null) {
     questions.push({
       type: 'select',
       name: 'type',
@@ -34,12 +34,12 @@ export async function runPrompts(partial: PartialOptions): Promise<CreateModuleO
   }
 
   // Module name
-  if (!partial.name) {
+  if (partial.name == null || partial.name === '') {
     questions.push({
       type: 'text',
       name: 'name',
       message: (_prev: unknown, values: Record<string, unknown>) => {
-        const type = (values.type || partial.type) as ModuleType
+        const type = (values.type as ModuleType | undefined) ?? partial.type
         if (type === 'wallet') return 'What is the blockchain name? (e.g., "stellar", "solana")'
         if (type === 'fiat') return 'What is the provider name? (e.g., "moonpay", "ramp")'
         return 'What is the protocol name? (e.g., "jupiter", "wormhole")'
@@ -54,9 +54,10 @@ export async function runPrompts(partial: PartialOptions): Promise<CreateModuleO
   // Blockchain (for protocol modules)
   questions.push({
     type: (_prev: unknown, values: Record<string, unknown>) => {
-      const type = (values.type || partial.type) as ModuleType
+      const type = (values.type as ModuleType | undefined) ?? partial.type
+      if (type == null) return null
       const config = MODULE_CONFIGS[type]
-      return config?.requiresBlockchain && !partial.blockchain ? 'select' : null
+      return config.requiresBlockchain && (partial.blockchain == null || partial.blockchain === '') ? 'select' : null
     },
     name: 'blockchain',
     message: 'What blockchain does this target?',
@@ -88,7 +89,7 @@ export async function runPrompts(partial: PartialOptions): Promise<CreateModuleO
       name: 'scope',
       message: 'npm scope (leave empty for none, e.g., @myorg):',
       validate: (value: string) => {
-        if (!value) return true
+        if (value === '') return true
         const result = validateScope(value)
         return result.valid || result.errors[0]
       }
@@ -107,13 +108,13 @@ export async function runPrompts(partial: PartialOptions): Promise<CreateModuleO
 
   const answers = await prompts(questions, { onCancel })
 
-  const blockchain = answers.blockchainCustom || answers.blockchain
+  const blockchainAnswer = (answers.blockchainCustom as string | undefined) ?? (answers.blockchain as string | undefined)
 
   return {
-    type: partial.type || answers.type,
-    name: partial.name || answers.name,
-    blockchain: partial.blockchain || (blockchain === '_custom' ? undefined : blockchain),
-    scope: partial.scope || answers.scope || undefined,
-    git: partial.git ?? answers.git ?? true
+    type: partial.type ?? (answers.type as ModuleType),
+    name: partial.name ?? (answers.name as string),
+    blockchain: partial.blockchain ?? (blockchainAnswer === '_custom' ? undefined : blockchainAnswer),
+    scope: partial.scope ?? (answers.scope as string | undefined) ?? undefined,
+    git: partial.git ?? (answers.git as boolean | undefined) ?? true
   }
 }

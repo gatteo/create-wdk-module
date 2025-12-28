@@ -20,7 +20,7 @@ program
   .option('--git', 'Initialize git repository', true)
   .option('--no-git', 'Skip git initialization')
   .option('-y, --yes', 'Skip prompts and use defaults', false)
-  .action(async (type, name, blockchain, options) => {
+  .action(async (typeArg: string | undefined, nameArg: string | undefined, blockchainArg: string | undefined, options: { scope?: string, git: boolean, yes: boolean }) => {
     console.log()
     console.log(pc.bold('  Create WDK Module'))
     console.log()
@@ -28,15 +28,15 @@ program
     try {
       let moduleOptions
 
-      if (type && name && options.yes) {
+      if (typeArg != null && nameArg != null && options.yes) {
         // Non-interactive mode with all required arguments
-        if (!validateModuleType(type)) {
-          console.error(pc.red(`Invalid module type: ${type}`))
+        if (!validateModuleType(typeArg)) {
+          console.error(pc.red(`Invalid module type: ${typeArg}`))
           console.error(pc.dim('Valid types: wallet, swap, bridge, lending, fiat'))
           process.exit(1)
         }
 
-        const nameValidation = validateModuleName(name)
+        const nameValidation = validateModuleName(nameArg)
         if (!nameValidation.valid) {
           console.error(pc.red('Invalid module name:'))
           nameValidation.errors.forEach(e => console.error(pc.red(`  - ${e}`)))
@@ -44,29 +44,29 @@ program
         }
 
         // Check if blockchain is required
-        const config = MODULE_CONFIGS[type as ModuleType]
-        if (config.requiresBlockchain && !blockchain) {
-          console.error(pc.red(`Blockchain argument is required for ${type} modules`))
-          console.error(pc.dim(`Usage: create-wdk-module ${type} <name> <blockchain>`))
+        const config = MODULE_CONFIGS[typeArg]
+        if (config.requiresBlockchain && (blockchainArg == null || blockchainArg === '')) {
+          console.error(pc.red(`Blockchain argument is required for ${typeArg} modules`))
+          console.error(pc.dim(`Usage: create-wdk-module ${typeArg} <name> <blockchain>`))
           process.exit(1)
         }
 
         moduleOptions = {
-          type: type as ModuleType,
-          name,
-          blockchain,
+          type: typeArg,
+          name: nameArg,
+          blockchain: blockchainArg,
           scope: options.scope,
           git: options.git
         }
-      } else if (type && name) {
+      } else if (typeArg != null && nameArg != null) {
         // Partial non-interactive mode
-        if (!validateModuleType(type)) {
-          console.error(pc.red(`Invalid module type: ${type}`))
+        if (!validateModuleType(typeArg)) {
+          console.error(pc.red(`Invalid module type: ${typeArg}`))
           console.error(pc.dim('Valid types: wallet, swap, bridge, lending, fiat'))
           process.exit(1)
         }
 
-        const nameValidation = validateModuleName(name)
+        const nameValidation = validateModuleName(nameArg)
         if (!nameValidation.valid) {
           console.error(pc.red('Invalid module name:'))
           nameValidation.errors.forEach(e => console.error(pc.red(`  - ${e}`)))
@@ -74,18 +74,18 @@ program
         }
 
         moduleOptions = await runPrompts({
-          type: type as ModuleType,
-          name,
-          blockchain,
+          type: typeArg,
+          name: nameArg,
+          blockchain: blockchainArg,
           scope: options.scope,
           git: options.git
         })
       } else {
         // Interactive mode
         moduleOptions = await runPrompts({
-          type: type as ModuleType | undefined,
-          name,
-          blockchain,
+          type: typeArg as ModuleType | undefined,
+          name: nameArg,
+          blockchain: blockchainArg,
           scope: options.scope,
           git: options.git
         })

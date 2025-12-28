@@ -1,0 +1,16 @@
+src/
+tests/
+docs/
+demo/
+.github/
+.vscode/
+.gitignore
+.editorconfig
+tsconfig.json
+jest.config.js
+coverage/
+*.log
+.env
+.env.*
+*.mp4
+*.mov

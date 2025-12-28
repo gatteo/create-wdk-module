@@ -3,27 +3,26 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import pc from 'picocolors'
 import ora from 'ora'
-import { CreateModuleOptions, TemplateContext, MODULE_CONFIGS } from './types.js'
+import { CreateModuleOptions, TemplateContext } from './types.js'
 import { copyTemplate, copyCommonFiles } from './helpers/copy.js'
 import { initGit, getGitAuthor, isGitAvailable } from './helpers/git.js'
 import { generatePackageName, toPascalCase } from './helpers/validate.js'
 import { detectPackageManager, getInstallCommand } from './helpers/install.js'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const TEMPLATES_DIR = path.resolve(__dirname, '../templates')
+const currentDir = path.dirname(fileURLToPath(import.meta.url))
+const TEMPLATES_DIR = path.resolve(currentDir, '../templates')
 
-export async function createModule(options: CreateModuleOptions): Promise<void> {
+export async function createModule (options: CreateModuleOptions): Promise<void> {
   const { type, name, blockchain, scope, git } = options
-  const config = MODULE_CONFIGS[type]
 
   // Generate names
   const packageName = generatePackageName(type, name, blockchain, scope)
-  const dirName = scope
+  const dirName = scope != null && scope !== ''
     ? packageName.replace(`${scope}/`, '')
     : packageName
   const className = toPascalCase(name)
   const classNameLower = name.toLowerCase()
-  const blockchainName = blockchain || name
+  const blockchainName = blockchain ?? name
 
   // Create context for template processing
   const context: TemplateContext = {
@@ -105,7 +104,7 @@ export async function createModule(options: CreateModuleOptions): Promise<void> 
   console.log()
 }
 
-function generateDescription(type: string, className: string, blockchain: string): string {
+function generateDescription (type: string, className: string, blockchain: string): string {
   switch (type) {
     case 'wallet':
       return `${className} wallet module for WDK`
