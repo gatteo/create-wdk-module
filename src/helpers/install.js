@@ -1,8 +1,9 @@
 import { spawn } from 'child_process'
 
-type PackageManager = 'npm' | 'yarn' | 'pnpm'
-
-export function detectPackageManager (): PackageManager {
+/**
+ * @returns {'npm' | 'yarn' | 'pnpm'}
+ */
+export function detectPackageManager () {
   const userAgent = process.env.npm_config_user_agent ?? ''
 
   if (userAgent.startsWith('yarn')) return 'yarn'
@@ -10,10 +11,12 @@ export function detectPackageManager (): PackageManager {
   return 'npm'
 }
 
-export async function installDependencies (
-  targetDir: string,
-  packageManager: PackageManager = 'npm'
-): Promise<void> {
+/**
+ * @param {string} targetDir
+ * @param {'npm' | 'yarn' | 'pnpm'} [packageManager='npm']
+ * @returns {Promise<void>}
+ */
+export async function installDependencies (targetDir, packageManager = 'npm') {
   const command = packageManager === 'yarn' ? 'yarn' : packageManager
   const args = packageManager === 'yarn' ? [] : ['install']
 
@@ -34,7 +37,11 @@ export async function installDependencies (
   })
 }
 
-export function getInstallCommand (packageManager: PackageManager): string {
+/**
+ * @param {'npm' | 'yarn' | 'pnpm'} packageManager
+ * @returns {string}
+ */
+export function getInstallCommand (packageManager) {
   switch (packageManager) {
     case 'yarn':
       return 'yarn'

@@ -3,7 +3,6 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import pc from 'picocolors'
 import ora from 'ora'
-import { CreateModuleOptions, TemplateContext } from './types.js'
 import { copyTemplate, copyCommonFiles } from './helpers/copy.js'
 import { initGit, getGitAuthor, isGitAvailable } from './helpers/git.js'
 import { generatePackageName, toPascalCase } from './helpers/validate.js'
@@ -12,10 +11,12 @@ import { detectPackageManager, getInstallCommand } from './helpers/install.js'
 const currentDir = path.dirname(fileURLToPath(import.meta.url))
 const TEMPLATES_DIR = path.resolve(currentDir, '../templates')
 
-export async function createModule (options: CreateModuleOptions): Promise<void> {
+/**
+ * @param {import('./types.js').CreateModuleOptions} options
+ */
+export async function createModule (options) {
   const { type, name, blockchain, scope, git } = options
 
-  // Generate names
   const packageName = generatePackageName(type, name, blockchain, scope)
   const dirName = scope != null && scope !== ''
     ? packageName.replace(`${scope}/`, '')
@@ -24,8 +25,7 @@ export async function createModule (options: CreateModuleOptions): Promise<void>
   const classNameLower = name.toLowerCase()
   const blockchainName = blockchain ?? name
 
-  // Create context for template processing
-  const context: TemplateContext = {
+  const context = {
     MODULE_NAME: packageName,
     CLASS_NAME: className,
     CLASS_NAME_LOWER: classNameLower,
@@ -38,7 +38,6 @@ export async function createModule (options: CreateModuleOptions): Promise<void>
 
   const targetDir = path.resolve(process.cwd(), dirName)
 
-  // Check if directory exists
   if (await fs.pathExists(targetDir)) {
     console.error(pc.red(`\nDirectory ${dirName} already exists`))
     process.exit(1)
@@ -46,7 +45,6 @@ export async function createModule (options: CreateModuleOptions): Promise<void>
 
   console.log(pc.dim(`Creating ${pc.bold(packageName)}...\n`))
 
-  // Copy common template files
   const commonSpinner = ora('Copying common files').start()
   try {
     const commonDir = path.join(TEMPLATES_DIR, 'common')
@@ -61,7 +59,6 @@ export async function createModule (options: CreateModuleOptions): Promise<void>
     throw error
   }
 
-  // Copy module-specific template files
   const templateSpinner = ora('Copying template files').start()
   try {
     const templateDir = path.join(TEMPLATES_DIR, type)
@@ -79,7 +76,6 @@ export async function createModule (options: CreateModuleOptions): Promise<void>
     throw error
   }
 
-  // Initialize git
   if (git && isGitAvailable()) {
     const gitSpinner = ora('Initializing git repository').start()
     try {
@@ -90,7 +86,6 @@ export async function createModule (options: CreateModuleOptions): Promise<void>
     }
   }
 
-  // Success message
   console.log()
   console.log(pc.green(pc.bold('Success!')), `Created ${pc.bold(packageName)} at ${pc.dim(`./${dirName}`)}`)
   console.log()
@@ -104,7 +99,13 @@ export async function createModule (options: CreateModuleOptions): Promise<void>
   console.log()
 }
 
-function generateDescription (type: string, className: string, blockchain: string): string {
+/**
+ * @param {string} type
+ * @param {string} className
+ * @param {string} blockchain
+ * @returns {string}
+ */
+function generateDescription (type, className, blockchain) {
   switch (type) {
     case 'wallet':
       return `${className} wallet module for WDK`

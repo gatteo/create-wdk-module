@@ -1,12 +1,20 @@
 import validateNpmPackageName from 'validate-npm-package-name'
-import { ModuleType, MODULE_CONFIGS } from '../types.js'
+import { MODULE_CONFIGS } from '../types.js'
 
-export function validateModuleType (type: string): type is ModuleType {
+/**
+ * @param {string} type
+ * @returns {boolean}
+ */
+export function validateModuleType (type) {
   return ['wallet', 'swap', 'bridge', 'lending', 'fiat'].includes(type)
 }
 
-export function validateModuleName (name: string): { valid: boolean, errors: string[] } {
-  const errors: string[] = []
+/**
+ * @param {string} name
+ * @returns {{ valid: boolean, errors: string[] }}
+ */
+export function validateModuleName (name) {
+  const errors = []
 
   if (name === '' || name.trim() === '') {
     errors.push('Module name cannot be empty')
@@ -23,8 +31,12 @@ export function validateModuleName (name: string): { valid: boolean, errors: str
   return { valid: errors.length === 0, errors }
 }
 
-export function validateScope (scope: string): { valid: boolean, errors: string[] } {
-  const errors: string[] = []
+/**
+ * @param {string} scope
+ * @returns {{ valid: boolean, errors: string[] }}
+ */
+export function validateScope (scope) {
+  const errors = []
 
   if (scope !== '' && !scope.startsWith('@')) {
     errors.push('Scope must start with @')
@@ -40,14 +52,16 @@ export function validateScope (scope: string): { valid: boolean, errors: string[
   return { valid: errors.length === 0, errors }
 }
 
-export function generatePackageName (
-  type: ModuleType,
-  name: string,
-  blockchain?: string,
-  scope?: string
-): string {
+/**
+ * @param {string} type
+ * @param {string} name
+ * @param {string} [blockchain]
+ * @param {string} [scope]
+ * @returns {string}
+ */
+export function generatePackageName (type, name, blockchain, scope) {
   const config = MODULE_CONFIGS[type]
-  let packageName: string
+  let packageName
 
   if (type === 'wallet') {
     packageName = `${config.prefix}${name}`
@@ -63,7 +77,11 @@ export function generatePackageName (
   return scope != null && scope !== '' ? `${scope}/${packageName}` : packageName
 }
 
-export function toPascalCase (str: string): string {
+/**
+ * @param {string} str
+ * @returns {string}
+ */
+export function toPascalCase (str) {
   return str
     .split('-')
     .map(part => part.charAt(0).toUpperCase() + part.slice(1))

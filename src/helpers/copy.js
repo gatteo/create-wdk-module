@@ -1,14 +1,14 @@
 import fs from 'fs-extra'
 import path from 'path'
-import { TemplateContext } from '../types.js'
 
 const PLACEHOLDER_REGEX = /\{\{([A-Z_]+)\}\}/g
 
-export async function copyTemplate (
-  templateDir: string,
-  targetDir: string,
-  context: TemplateContext
-): Promise<void> {
+/**
+ * @param {string} templateDir
+ * @param {string} targetDir
+ * @param {import('../types.js').TemplateContext} context
+ */
+export async function copyTemplate (templateDir, targetDir, context) {
   await fs.ensureDir(targetDir)
 
   const files = await getAllFiles(templateDir)
@@ -30,14 +30,17 @@ export async function copyTemplate (
   }
 }
 
-async function getAllFiles (dir: string): Promise<string[]> {
+/**
+ * @param {string} dir
+ * @returns {Promise<string[]>}
+ */
+async function getAllFiles (dir) {
   const entries = await fs.readdir(dir, { withFileTypes: true })
-  const files: string[] = []
+  const files = []
 
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name)
     if (entry.isDirectory()) {
-      // Skip .git directories
       if (entry.name !== '.git') {
         files.push(...await getAllFiles(fullPath))
       }
@@ -49,30 +52,45 @@ async function getAllFiles (dir: string): Promise<string[]> {
   return files
 }
 
-function processPath (filePath: string, context: TemplateContext): string {
-  return filePath.replace(PLACEHOLDER_REGEX, (_, key: string) => {
-    const value = context[key as keyof TemplateContext]
+/**
+ * @param {string} filePath
+ * @param {import('../types.js').TemplateContext} context
+ * @returns {string}
+ */
+function processPath (filePath, context) {
+  return filePath.replace(PLACEHOLDER_REGEX, (_, key) => {
+    const value = context[key]
     return value !== '' && value != null ? value : key
   })
 }
 
-function processContent (content: string, context: TemplateContext): string {
-  return content.replace(PLACEHOLDER_REGEX, (_, key: string) => {
-    const value = context[key as keyof TemplateContext]
+/**
+ * @param {string} content
+ * @param {import('../types.js').TemplateContext} context
+ * @returns {string}
+ */
+function processContent (content, context) {
+  return content.replace(PLACEHOLDER_REGEX, (_, key) => {
+    const value = context[key]
     return value !== '' && value != null ? value : `{{${key}}}`
   })
 }
 
-function isBinaryFile (filePath: string): boolean {
+/**
+ * @param {string} filePath
+ * @returns {boolean}
+ */
+function isBinaryFile (filePath) {
   const binaryExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.ico', '.woff', '.woff2', '.ttf', '.eot']
   return binaryExtensions.some(ext => filePath.toLowerCase().endsWith(ext))
 }
 
-export async function copyCommonFiles (
-  commonDir: string,
-  targetDir: string,
-  context: TemplateContext
-): Promise<void> {
+/**
+ * @param {string} commonDir
+ * @param {string} targetDir
+ * @param {import('../types.js').TemplateContext} context
+ */
+export async function copyCommonFiles (commonDir, targetDir, context) {
   if (await fs.pathExists(commonDir)) {
     await copyTemplate(commonDir, targetDir, context)
   }

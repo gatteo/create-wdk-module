@@ -33,9 +33,6 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Build
-        run: npm run build
-
       - name: Run tests
         run: npm test
 
@@ -56,9 +53,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-
-      - name: Build
-        run: npm run build
 
       # Dry-run when invoked via workflow_call with dry_run=true
       - name: Publish to npm (dry-run)

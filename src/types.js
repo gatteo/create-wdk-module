@@ -1,35 +1,41 @@
-export type ModuleType = 'wallet' | 'swap' | 'bridge' | 'lending' | 'fiat'
+/**
+ * @typedef {'wallet' | 'swap' | 'bridge' | 'lending' | 'fiat'} ModuleType
+ */
 
-export interface CreateModuleOptions {
-  type: ModuleType
-  name: string
-  blockchain?: string
-  scope?: string
-  git: boolean
-  skipInstall?: boolean
-}
+/**
+ * @typedef {Object} CreateModuleOptions
+ * @property {ModuleType} type
+ * @property {string} name
+ * @property {string} [blockchain]
+ * @property {string} [scope]
+ * @property {boolean} git
+ * @property {boolean} [skipInstall]
+ */
 
-export interface TemplateContext {
-  MODULE_NAME: string // @myorg/wdk-wallet-stellar
-  CLASS_NAME: string // Stellar
-  CLASS_NAME_LOWER: string // stellar (for filenames)
-  PACKAGE_NAME: string // wdk-wallet-stellar
-  BLOCKCHAIN: string // stellar
-  DESCRIPTION: string // Stellar wallet module for WDK
-  YEAR: string // 2025
-  AUTHOR: string // From git config or prompt
-}
+/**
+ * @typedef {Object} TemplateContext
+ * @property {string} MODULE_NAME - @myorg/wdk-wallet-stellar
+ * @property {string} CLASS_NAME - Stellar
+ * @property {string} CLASS_NAME_LOWER - stellar (for filenames)
+ * @property {string} PACKAGE_NAME - wdk-wallet-stellar
+ * @property {string} BLOCKCHAIN - stellar
+ * @property {string} DESCRIPTION - Stellar wallet module for WDK
+ * @property {string} YEAR - 2025
+ * @property {string} AUTHOR - From git config or prompt
+ */
 
-export interface ModuleConfig {
-  type: ModuleType
-  prefix: string
-  namingPattern: string
-  requiresBlockchain: boolean
-  basePackage: string
-  keywords: string[]
-}
+/**
+ * @typedef {Object} ModuleConfig
+ * @property {ModuleType} type
+ * @property {string} prefix
+ * @property {string} namingPattern
+ * @property {boolean} requiresBlockchain
+ * @property {string} basePackage
+ * @property {string[]} keywords
+ */
 
-export const MODULE_CONFIGS: Record<ModuleType, ModuleConfig> = {
+/** @type {Record<ModuleType, ModuleConfig>} */
+export const MODULE_CONFIGS = {
   wallet: {
     type: 'wallet',
     prefix: 'wdk-wallet-',

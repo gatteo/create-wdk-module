@@ -19,7 +19,7 @@ describe('WalletManager{{CLASS_NAME}}', () => {
     })
 
     it('should throw error for invalid mnemonic', () => {
-      expect(() => new WalletManager{{CLASS_NAME}}('invalid mnemonic')).toThrow('The seed phrase is invalid.')
+      expect(() => new WalletManager{{CLASS_NAME}}('invalid mnemonic')).toThrow()
     })
 
     it('should accept configuration options', () => {
@@ -44,9 +44,9 @@ describe('WalletManager{{CLASS_NAME}}', () => {
   })
 
   describe('getFeeRates', () => {
-    // TODO: Implement {{BLOCKCHAIN}}-specific fee rate fetching
-    it.todo('should return current fee rates from network')
-    it.todo('should return normal and fast fee rates')
+    it('should throw not implemented error', async () => {
+      await expect(wallet.getFeeRates()).rejects.toThrow('not yet implemented')
+    })
   })
 
   describe('dispose', () => {

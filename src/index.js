@@ -5,14 +5,14 @@ import pc from 'picocolors'
 import { createModule } from './create-module.js'
 import { runPrompts } from './prompts.js'
 import { validateModuleType, validateModuleName } from './helpers/validate.js'
-import { ModuleType, MODULE_CONFIGS } from './types.js'
+import { MODULE_CONFIGS } from './types.js'
 
 const program = new Command()
 
 program
   .name('create-wdk-module')
   .description('Create WDK modules with a single command')
-  .version('1.0.0')
+  .version('1.0.0-beta.1')
   .argument('[type]', 'Module type (wallet/swap/bridge/lending/fiat)')
   .argument('[name]', 'Module or protocol name')
   .argument('[blockchain]', 'Target blockchain (for protocol modules)')
@@ -20,7 +20,7 @@ program
   .option('--git', 'Initialize git repository', true)
   .option('--no-git', 'Skip git initialization')
   .option('-y, --yes', 'Skip prompts and use defaults', false)
-  .action(async (typeArg: string | undefined, nameArg: string | undefined, blockchainArg: string | undefined, options: { scope?: string, git: boolean, yes: boolean }) => {
+  .action(async (typeArg, nameArg, blockchainArg, options) => {
     console.log()
     console.log(pc.bold('  Create WDK Module'))
     console.log()
@@ -29,7 +29,6 @@ program
       let moduleOptions
 
       if (typeArg != null && nameArg != null && options.yes) {
-        // Non-interactive mode with all required arguments
         if (!validateModuleType(typeArg)) {
           console.error(pc.red(`Invalid module type: ${typeArg}`))
           console.error(pc.dim('Valid types: wallet, swap, bridge, lending, fiat'))
@@ -43,7 +42,6 @@ program
           process.exit(1)
         }
 
-        // Check if blockchain is required
         const config = MODULE_CONFIGS[typeArg]
         if (config.requiresBlockchain && (blockchainArg == null || blockchainArg === '')) {
           console.error(pc.red(`Blockchain argument is required for ${typeArg} modules`))
@@ -59,7 +57,6 @@ program
           git: options.git
         }
       } else if (typeArg != null && nameArg != null) {
-        // Partial non-interactive mode
         if (!validateModuleType(typeArg)) {
           console.error(pc.red(`Invalid module type: ${typeArg}`))
           console.error(pc.dim('Valid types: wallet, swap, bridge, lending, fiat'))
@@ -81,9 +78,8 @@ program
           git: options.git
         })
       } else {
-        // Interactive mode
         moduleOptions = await runPrompts({
-          type: typeArg as ModuleType | undefined,
+          type: typeArg,
           name: nameArg,
           blockchain: blockchainArg,
           scope: options.scope,

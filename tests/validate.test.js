@@ -75,6 +75,10 @@ describe('generatePackageName', () => {
   it('should generate correct fiat package name', () => {
     expect(generatePackageName('fiat', 'moonpay')).toBe('wdk-protocol-fiat-moonpay')
   })
+
+  it('should throw when blockchain missing for protocol modules', () => {
+    expect(() => generatePackageName('swap', 'jupiter')).toThrow('Blockchain is required')
+  })
 })
 
 describe('toPascalCase', () => {
